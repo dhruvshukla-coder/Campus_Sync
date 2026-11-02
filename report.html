@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Report Item — CampusSync</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon/favicon.svg">
+  <link rel="stylesheet" href="css/style.css">
+  <!-- Authentication & Access Gate -->
+  <script src="js/auth.js"></script>
+  <script>CampusAuth.requireAuth();</script>
+</head>
+<body>
+
+  <div class="app-layout">
+
+    <!-- DESKTOP SIDEBAR -->
+    <aside class="app-sidebar">
+      <div class="sidebar-header">
+        <a href="index.html" class="sidebar-logo">
+          <div class="sidebar-logo-icon">⚡</div>
+          <span class="sidebar-logo-text">Campus<strong>Sync</strong></span>
+        </a>
+        <button id="sidebarCloseBtn" class="topbar-btn" style="display: none;" aria-label="Close sidebar">&times;</button>
+      </div>
+
+      <div class="sidebar-nav-container">
+        <span class="sidebar-section-title">Navigation</span>
+        <ul class="sidebar-menu">
+          <li>
+            <a href="index.html" class="sidebar-link">
+              <span class="sidebar-link-icon">🏠</span>
+              <span>Home</span>
+            </a>
+          </li>
+          <li>
+            <a href="navigation.html" class="sidebar-link">
+              <span class="sidebar-link-icon">📍</span>
+              <span>Where is your Block?</span>
+              <span class="sidebar-badge badge-live">LIVE</span>
+            </a>
+          </li>
+          <li>
+            <a href="lost-found.html" class="sidebar-link active">
+              <span class="sidebar-link-icon">🔎</span>
+              <span>Lost &amp; Found</span>
+            </a>
+          </li>
+          <li>
+            <a href="spaces.html" class="sidebar-link">
+              <span class="sidebar-link-icon">🏫</span>
+              <span>Spaces</span>
+            </a>
+          </li>
+          <li>
+            <a href="events.html" class="sidebar-link">
+              <span class="sidebar-link-icon">📅</span>
+              <span>Events</span>
+            </a>
+          </li>
+          <li>
+            <a href="navigation.html" class="sidebar-link">
+              <span class="sidebar-link-icon">🗺️</span>
+              <span>Campus Map</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="sidebar-footer">
+        <a href="#" class="sidebar-user profile-trigger-btn" title="View Student Profile">
+          <div class="user-avatar user-initials">--</div>
+          <div class="user-info">
+            <div class="user-name">Student</div>
+            <div class="user-dept user-reg-no">--</div>
+          </div>
+        </a>
+        <div class="sidebar-footer-actions">
+          <button type="button" class="logout-btn" title="Sign out / Logout" onclick="if(typeof CampusAuth!=='undefined'){CampusAuth.logout();}else{try{localStorage.removeItem('campussync_current_session');localStorage.removeItem('campussync_user_profile');}catch(e){}window.location.href='login.html';}">🚪</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN WRAPPER -->
+    <div class="app-main">
+
+      <header class="mobile-header-bar">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <button id="mobileMenuBtn" class="topbar-btn">☰</button>
+          <a href="index.html" class="sidebar-logo">
+            <span class="sidebar-logo-text">Campus<strong>Sync</strong></span>
+          </a>
+        </div>
+      </header>
+
+      <main class="page-content-wrapper" style="max-width: 850px;">
+
+        <div style="margin-bottom: 1.75rem;">
+          <a href="lost-found.html" class="btn btn-outline btn-sm" style="margin-bottom: 0.75rem;">&larr; Back to Lost &amp; Found</a>
+          <h1 style="color: #fff; font-size: 2rem; font-weight: 800; margin-bottom: 0.35rem;">Report an Item</h1>
+          <p style="color: var(--text-muted);">Log a lost belonging or report an item you found on campus.</p>
+        </div>
+
+        <div class="glass-card" style="padding: 2rem;">
+          <form id="dedicatedReportForm">
+            <!-- Type Selector Tabs -->
+            <div class="filter-type-segmented" style="width: 100%; display: grid; grid-template-columns: 1fr 1fr; margin-bottom: 1.5rem;">
+              <button type="button" class="filter-segment-btn active" id="tabDedicLost">I Lost an Item</button>
+              <button type="button" class="filter-segment-btn" id="tabDedicFound">I Found an Item</button>
+            </div>
+            <input type="hidden" id="dedicTypeInput" value="lost">
+
+            <!-- File upload -->
+            <div class="form-group" style="margin-bottom: 1.25rem;">
+              <label class="form-label">Upload Image (Optional)</label>
+              <div class="file-upload-zone" id="dedicFileDropzone">
+                <input type="file" id="dedicFileInput" accept="image/*" style="display: none;">
+                <div id="dedicPrompt">
+                  <span style="font-size: 2rem; display: block; margin-bottom: 0.25rem;">📷</span>
+                  <span style="font-size: 0.9rem; color: var(--accent-primary); font-weight: 600;">Click to select photo</span>
+                  <span style="font-size: 0.75rem; color: var(--text-dim); display: block; margin-top: 0.2rem;">PNG, JPG, WebP up to 5MB</span>
+                </div>
+                <img id="dedicPreview" class="file-preview-img" style="display: none;" alt="Preview">
+              </div>
+            </div>
+
+            <!-- Item Name -->
+            <div class="form-group" style="margin-bottom: 1.25rem;">
+              <label class="form-label" for="dedicItemName">Item Name <span style="color: var(--accent-rose);">*</span></label>
+              <input type="text" id="dedicItemName" class="form-input" placeholder="e.g. AirPods Case, Black Backpack" required>
+            </div>
+
+            <!-- Category & Colour -->
+            <div class="form-row-2col" style="margin-bottom: 1.25rem;">
+              <div class="form-group">
+                <label class="form-label" for="dedicCategory">Category <span style="color: var(--accent-rose);">*</span></label>
+                <select id="dedicCategory" class="form-select" required>
+                  <option value="" disabled selected>Select category</option>
+                  <option value="Electronics">Electronics</option>
+                  <option value="Bags">Bags</option>
+                  <option value="Cards/IDs">ID Cards</option>
+                  <option value="Personal">Wallets &amp; Personal</option>
+                  <option value="Books/Notes">Books &amp; Notes</option>
+                  <option value="Keys">Keys</option>
+                  <option value="Clothing">Clothing</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="dedicColour">Colour <span style="color: var(--accent-rose);">*</span></label>
+                <input type="text" id="dedicColour" class="form-input" placeholder="e.g. Black, White, Silver" required>
+              </div>
+            </div>
+
+            <!-- Location & Date -->
+            <div class="form-row-2col" style="margin-bottom: 1.25rem;">
+              <div class="form-group">
+                <label class="form-label" for="dedicLocation">Campus Location <span style="color: var(--accent-rose);">*</span></label>
+                <input type="text" id="dedicLocation" class="form-input" placeholder="e.g. Central Library 2nd Floor, Block S" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="dedicDate">Date <span style="color: var(--accent-rose);">*</span></label>
+                <input type="date" id="dedicDate" class="form-input" required>
+              </div>
+            </div>
+
+            <!-- Description -->
+            <div class="form-group" style="margin-bottom: 1.25rem;">
+              <label class="form-label" for="dedicDesc">Description &amp; Identifying Details <span style="color: var(--accent-rose);">*</span></label>
+              <textarea id="dedicDesc" class="form-textarea" rows="4" placeholder="Include unique scratches, stickers, brand marks..." required></textarea>
+            </div>
+
+            <!-- Contact Email -->
+            <div class="form-group" style="margin-bottom: 1.75rem;">
+              <label class="form-label" for="dedicEmail">
+                Contact Email <span style="color: var(--accent-rose);">*</span>
+                <span style="color: var(--accent-primary); font-size: 0.75rem;">(Private • Protected)</span>
+              </label>
+              <input type="email" id="dedicEmail" class="form-input" placeholder="yourname@campus.edu" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-large" style="width: 100%;">
+              Submit Report
+            </button>
+          </form>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="data/demo-data.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const typeInput = document.getElementById("dedicTypeInput");
+      const tabLost = document.getElementById("tabDedicLost");
+      const tabFound = document.getElementById("tabDedicFound");
+      const dropzone = document.getElementById("dedicFileDropzone");
+      const fileInput = document.getElementById("dedicFileInput");
+      const preview = document.getElementById("dedicPreview");
+      const prompt = document.getElementById("dedicPrompt");
+      const form = document.getElementById("dedicatedReportForm");
+      let base64 = "";
+
+      // Check URL query e.g. report.html?type=found
+      const urlType = new URLSearchParams(window.location.search).get("type");
+      if (urlType === "found") {
+        typeInput.value = "found";
+        tabFound.classList.add("active");
+        tabLost.classList.remove("active");
+      }
+
+      tabLost.addEventListener("click", () => {
+        typeInput.value = "lost";
+        tabLost.classList.add("active");
+        tabFound.classList.remove("active");
+      });
+
+      tabFound.addEventListener("click", () => {
+        typeInput.value = "found";
+        tabFound.classList.add("active");
+        tabLost.classList.remove("active");
+      });
+
+      dropzone.addEventListener("click", () => fileInput.click());
+      fileInput.addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          base64 = evt.target.result;
+          prompt.style.display = "none";
+          preview.src = base64;
+          preview.style.display = "block";
+        };
+        reader.readAsDataURL(file);
+      });
+
+      // Set today
+      document.getElementById("dedicDate").value = new Date().toISOString().split("T")[0];
+
+      // Prefill contact email from active user session
+      try {
+        const currentUser = typeof CampusAuth !== "undefined" ? CampusAuth.getCurrentUser() : null;
+        if (currentUser && currentUser.email) {
+          const emailInput = document.getElementById("dedicEmail");
+          if (emailInput && !emailInput.value) emailInput.value = currentUser.email;
+        }
+      } catch (err) {}
+
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const type = typeInput.value;
+        const name = document.getElementById("dedicItemName").value.trim();
+        const category = document.getElementById("dedicCategory").value;
+        const colour = document.getElementById("dedicColour").value.trim();
+        const location = document.getElementById("dedicLocation").value.trim();
+        const date = document.getElementById("dedicDate").value;
+        const desc = document.getElementById("dedicDesc").value.trim();
+        const email = document.getElementById("dedicEmail").value.trim();
+
+        let img = base64;
+        if (!img) {
+          img = "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=800&q=80";
+        }
+
+        const newReport = {
+          id: "lf-" + Date.now(),
+          type,
+          itemName: name,
+          category,
+          colour,
+          location,
+          date,
+          time: "Just now",
+          description: desc,
+          contactEmail: email,
+          image: img,
+          status: "active",
+          relativeTime: "Just now"
+        };
+
+        const existing = getStoredReports();
+        existing.unshift(newReport);
+        saveStoredReports(existing);
+
+        showToast("Report submitted successfully! Redirecting...", "success");
+        setTimeout(() => {
+          window.location.href = "lost-found.html";
+        }, 1000);
+      });
+    });
+  </script>
+</body>
+</html>

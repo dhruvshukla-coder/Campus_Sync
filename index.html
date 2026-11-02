@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CampusSync — Your Campus, In Sync</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon/favicon.svg">
+  <!-- Leaflet Map CSS for Mini Map Preview -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <!-- CampusSync Design System -->
+  <link rel="stylesheet" href="css/style.css">
+  <!-- Authentication Gate -->
+  <script src="js/auth.js"></script>
+  <script>
+    CampusAuth.requireAuth();
+  </script>
+</head>
+
+<body>
+
+  <div class="app-layout">
+
+    <!-- DESKTOP SIDEBAR -->
+    <aside class="app-sidebar">
+      <div class="sidebar-header">
+        <a href="index.html" class="sidebar-logo">
+          <div class="sidebar-logo-icon">⚡</div>
+          <span class="sidebar-logo-text">Campus<strong>Sync</strong></span>
+        </a>
+        <button id="sidebarCloseBtn" class="topbar-btn" style="display: none;" aria-label="Close sidebar">&times;</button>
+      </div>
+
+      <div class="sidebar-nav-container">
+        <span class="sidebar-section-title">Navigation</span>
+        <ul class="sidebar-menu">
+          <li>
+            <a href="index.html" class="sidebar-link active">
+              <span class="sidebar-link-icon">🏠</span>
+              <span>Home</span>
+            </a>
+          </li>
+          <li>
+            <a href="navigation.html" class="sidebar-link">
+              <span class="sidebar-link-icon">📍</span>
+              <span>Where is your Block?</span>
+              <span class="sidebar-badge badge-live">LIVE</span>
+            </a>
+          </li>
+          <li>
+            <a href="lost-found.html" class="sidebar-link">
+              <span class="sidebar-link-icon">🔎</span>
+              <span>Lost &amp; Found</span>
+              <span class="sidebar-badge badge-count">10</span>
+            </a>
+          </li>
+          <li>
+            <a href="spaces.html" class="sidebar-link">
+              <span class="sidebar-link-icon">🏫</span>
+              <span>Spaces</span>
+              <span class="sidebar-badge badge-count">2 EMPTY</span>
+            </a>
+          </li>
+          <li>
+            <a href="events.html" class="sidebar-link">
+              <span class="sidebar-link-icon">📅</span>
+              <span>Events</span>
+              <span class="sidebar-badge badge-live">1 LIVE</span>
+            </a>
+          </li>
+          <li>
+            <a href="navigation.html" class="sidebar-link">
+              <span class="sidebar-link-icon">🗺️</span>
+              <span>Campus Map</span>
+            </a>
+          </li>
+        </ul>
+
+        <span class="sidebar-section-title">Campus Pulse</span>
+        <div class="sidebar-pulse-card">
+          <div class="pulse-header">
+            <span class="pulse-dot"></span>
+            <span>Campus Network Active</span>
+          </div>
+          <p class="pulse-info">
+            • GPS Routing Online<br>
+            • 12 Study Spaces Open<br>
+            • 2 Possible Matches Detected
+          </p>
+        </div>
+      </div>
+
+      <div class="sidebar-footer">
+        <a href="#" class="sidebar-user profile-trigger-btn" title="View Student Profile">
+          <div class="user-avatar user-initials">--</div>
+          <div class="user-info">
+            <div class="user-name">Student</div>
+            <div class="user-dept user-reg-no">--</div>
+          </div>
+        </a>
+        <div class="sidebar-footer-actions">
+          <button class="topbar-btn notif-toggle-btn" aria-label="Notifications" title="Campus Notifications">
+            <span>🔔</span>
+            <span class="notif-badge-pill" style="display: none;">0</span>
+          </button>
+          <button class="topbar-btn logout-btn" aria-label="Log Out" title="Log Out" onclick="if(typeof CampusAuth!=='undefined'){CampusAuth.logout();}else{localStorage.removeItem('campussync_current_session');localStorage.removeItem('campussync_user_profile');window.location.href='login.html';}">
+            <span style="font-size: 0.95rem;">🚪</span>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN WRAPPER -->
+    <div class="app-main">
+
+      <!-- TOP BAR (DESKTOP) -->
+      <header class="app-topbar">
+        <div class="topbar-search">
+          <span>🔍</span>
+          <input type="text" id="globalSearchInput" placeholder="Search blocks, spaces, lost items, events...">
+        </div>
+
+        <div class="topbar-actions">
+          <button class="topbar-btn profile-trigger-btn" title="Saved Bookmarks & Profile">
+            <span>🔖</span>
+            <span class="saved-badge-pill notif-badge-pill" style="display: none; background: var(--accent-secondary);">0</span>
+          </button>
+          <div class="notif-wrapper">
+            <button class="topbar-btn notif-toggle-btn" title="Notifications">
+              <span>🔔</span>
+              <span class="notif-badge-pill" style="display: none;">0</span>
+            </button>
+            <div class="notif-dropdown" id="notifDropdown">
+              <div class="notif-header">
+                <h4 style="margin: 0; font-size: 0.95rem; color: #fff;">Campus Notifications</h4>
+                <button class="btn btn-outline btn-sm" id="clearNotifsBtn" style="padding: 0.2rem 0.5rem; font-size: 0.72rem;">Clear</button>
+              </div>
+              <div class="notif-list" id="notifList"></div>
+            </div>
+          </div>
+          <a href="navigation.html" class="btn btn-primary btn-sm">
+            <span>📍</span> Get Directions
+          </a>
+        </div>
+      </header>
+
+      <!-- MOBILE TOP BAR -->
+      <header class="mobile-header-bar">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <button id="mobileMenuBtn" class="topbar-btn">☰</button>
+          <a href="index.html" class="sidebar-logo">
+            <span class="sidebar-logo-text">Campus<strong>Sync</strong></span>
+          </a>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <button class="topbar-btn notif-toggle-btn">
+            <span>🔔</span>
+            <span class="notif-badge-pill" style="display: none;">0</span>
+          </button>
+          <button class="topbar-btn profile-trigger-btn">
+            <span>👤</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- MAIN PAGE CONTENT -->
+      <main class="page-content-wrapper">
+
+        <!-- ========================================================
+             TOP GREETING & HERO SPLIT (SEARCH & MINI MAP)
+             ======================================================== -->
+        <div class="home-hero-grid">
+
+          <!-- Left: Hero Headline & "WHERE IS YOUR BLOCK?" Search -->
+          <div class="home-hero-card">
+            <div class="hero-welcome-badge">
+              <span class="pulse-dot"></span>
+              <span id="studentGreeting">Welcome to CampusSync! 👋</span>
+            </div>
+
+            <h1 class="hero-greeting-title">
+              Your Campus, Simpler.<br>
+              <span style="background: linear-gradient(135deg, var(--accent-primary), #a855f7); background-clip: text; -webkit-text-fill-color: transparent;">Everything In One Place.</span>
+            </h1>
+
+            <p class="hero-greeting-sub">
+              Live walking navigation, intelligent lost-and-found matching, verified empty study classrooms, and live campus events.
+            </p>
+
+            <!-- Prominent Feature 1 Search: WHERE IS YOUR BLOCK? -->
+            <div style="margin-top: 0.5rem;">
+              <div style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent-primary); margin-bottom: 0.5rem;">
+                📍 WHERE IS YOUR BLOCK?
+              </div>
+              <form id="heroNavForm" action="navigation.html" method="GET" class="hero-nav-search-bar">
+                <span>🏛️</span>
+                <input
+                  type="text"
+                  name="dest"
+                  id="heroBlockSearchInput"
+                  placeholder="Search block or location (e.g. Block S, Library, Block 32)..."
+                  autocomplete="off"
+                >
+                <button type="submit" class="btn btn-primary btn-sm">
+                  Go &rarr;
+                </button>
+              </form>
+
+              <!-- Quick suggestions -->
+              <div class="hero-suggestion-chips">
+                <span class="chip-label">Suggestions:</span>
+                <a href="navigation.html?dest=Block%20S" class="suggestion-chip">Block S</a>
+                <a href="navigation.html?dest=Block%2032" class="suggestion-chip">Block 32</a>
+                <a href="navigation.html?dest=Central%20Library" class="suggestion-chip">Library</a>
+                <a href="navigation.html?dest=Central%20Cafeteria" class="suggestion-chip">Cafeteria</a>
+                <a href="navigation.html?dest=Main%20Auditorium" class="suggestion-chip">Auditorium</a>
+                <a href="navigation.html?dest=Sports%20Complex" class="suggestion-chip">Sports Complex</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Campus Map Interactive Mini Preview -->
+          <div class="home-map-preview-card">
+            <div class="map-preview-header">
+              <div class="map-preview-title">
+                <span>🗺️</span> Campus Navigation Map
+              </div>
+              <a href="navigation.html" class="btn btn-outline btn-sm">Full Map ↗</a>
+            </div>
+
+            <div class="map-preview-container" id="miniMapContainer">
+              <div id="homeMiniMap" style="width: 100%; height: 100%;"></div>
+
+              <div class="map-preview-overlay-card">
+                <div>
+                  <div style="font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase;">Next Destination</div>
+                  <div style="font-size: 0.95rem; font-weight: 700; color: #fff;">Block S (Academic Wing)</div>
+                  <div style="font-size: 0.78rem; color: var(--accent-primary);">🚶 6 min • 450 m walk</div>
+                </div>
+                <a href="navigation.html?dest=Block%20S" class="btn btn-primary btn-sm">
+                  Start Route &rarr;
+                </a>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ========================================================
+             FOUR QUICK ACTION CARDS
+             ======================================================== -->
+        <section class="quick-actions-grid">
+          <!-- Card 1: Where is my Block? -->
+          <a href="navigation.html" class="action-card card-blue">
+            <div class="action-card-icon">📍</div>
+            <div>
+              <h3 class="action-card-title">Where is my Block?</h3>
+              <p class="action-card-sub">Find walking directions, building maps &amp; live GPS navigation.</p>
+            </div>
+            <div class="action-card-arrow">
+              <span>Find directions</span>
+              <span>&rarr;</span>
+            </div>
+          </a>
+
+          <!-- Card 2: Lost & Found -->
+          <a href="lost-found.html" class="action-card card-amber">
+            <div class="action-card-icon">🔎</div>
+            <div>
+              <h3 class="action-card-title">Lost &amp; Found</h3>
+              <p class="action-card-sub">Find or report an item. AI-inspired matching pairs candidates.</p>
+            </div>
+            <div class="action-card-arrow" style="color: var(--accent-amber);">
+              <span>Find or report an item</span>
+              <span>&rarr;</span>
+            </div>
+          </a>
+
+          <!-- Card 3: Events -->
+          <a href="events.html" class="action-card card-purple">
+            <div class="action-card-icon">📅</div>
+            <div>
+              <h3 class="action-card-title">Campus Events</h3>
+              <p class="action-card-sub">See live workshops, hackathons &amp; reserve your student seat.</p>
+            </div>
+            <div class="action-card-arrow" style="color: var(--accent-purple);">
+              <span>What's happening?</span>
+              <span>&rarr;</span>
+            </div>
+          </a>
+
+          <!-- Card 4: Find a Space -->
+          <a href="spaces.html" class="action-card card-teal">
+            <div class="action-card-icon">🏫</div>
+            <div>
+              <h3 class="action-card-title">Find a Space</h3>
+              <p class="action-card-sub">Discover vacant classrooms, silent study zones &amp; quiet labs.</p>
+            </div>
+            <div class="action-card-arrow" style="color: var(--accent-teal);">
+              <span>Find somewhere to study</span>
+              <span>&rarr;</span>
+            </div>
+          </a>
+        </section>
+
+        <!-- ========================================================
+             LIVE CAMPUS ACTIVITY FEED TICKER
+             ======================================================== -->
+        <section class="activity-ticker-container">
+          <div class="ticker-label">
+            <span class="pulse-dot"></span>
+            <span>Live Campus Activity</span>
+          </div>
+
+          <div class="ticker-content-track" id="tickerTrack">
+            <a href="spaces.html" class="ticker-item" id="tickerActiveItem">
+              <span>🟢</span>
+              <span>Block S — Room 204 is now empty (Available until 8:00 PM)</span>
+              <span class="time-ago">Just now</span>
+            </a>
+          </div>
+
+          <a href="lost-found.html" style="font-size: 0.8rem; color: var(--text-dim); white-space: nowrap; margin-left: auto;">
+            View All &rarr;
+          </a>
+        </section>
+
+        <!-- ========================================================
+             FEATURED HIGHLIGHTS (SPACES & EVENTS PREVIEW)
+             ======================================================== -->
+        <div class="home-featured-grid">
+
+          <!-- Spaces Spotlight: Empty Classrooms -->
+          <div class="glass-card" style="padding: 1.75rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <span style="font-size: 1.2rem;">🏫</span>
+                <h3 style="color: #fff; font-size: 1.2rem; font-weight: 700; margin: 0;">Verified Empty Rooms</h3>
+              </div>
+              <a href="spaces.html" style="font-size: 0.85rem;">All Spaces &rarr;</a>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+              <!-- Block S Room 204 Mini Card -->
+              <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1rem; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span class="badge badge-emerald" style="font-size: 0.68rem;">🟢 EMPTY</span>
+                    <strong style="color: #fff; font-size: 1rem;">Block S — Room 204</strong>
+                  </div>
+                  <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.25rem;">
+                    Available: 6:00 PM – 8:00 PM • Capacity: 60 (0 occupied)
+                  </div>
+                </div>
+                <a href="navigation.html?dest=Block%20S" class="btn btn-outline btn-sm">
+                  Navigate 🚶
+                </a>
+              </div>
+
+              <!-- Block 32 Room 301 Mini Card -->
+              <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1rem; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span class="badge badge-emerald" style="font-size: 0.68rem;">🟢 EMPTY</span>
+                    <strong style="color: #fff; font-size: 1rem;">Block 32 — Room 301</strong>
+                  </div>
+                  <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.25rem;">
+                    Available: 7:00 PM – 9:00 PM • Capacity: 45
+                  </div>
+                </div>
+                <a href="navigation.html?dest=Block%2032" class="btn btn-outline btn-sm">
+                  Navigate 🚶
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Events Spotlight: Happening Now -->
+          <div class="glass-card" style="padding: 1.75rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <span class="pulse-dot" style="background: var(--accent-rose); box-shadow: 0 0 10px var(--accent-rose);"></span>
+                <h3 style="color: #fff; font-size: 1.2rem; font-weight: 700; margin: 0;">Live on Campus</h3>
+              </div>
+              <a href="events.html" style="font-size: 0.85rem;">All Events &rarr;</a>
+            </div>
+
+            <!-- Mini Live Event Card -->
+            <div style="background: linear-gradient(135deg, rgba(244, 63, 94, 0.1), rgba(15, 23, 42, 0.8)); border: 1px solid rgba(244, 63, 94, 0.3); border-radius: var(--radius-md); padding: 1.25rem;">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                <span class="badge badge-live" style="font-size: 0.7rem;">🔴 Happening Now</span>
+                <span style="font-size: 0.78rem; color: #fb7185;">Started 25m ago</span>
+              </div>
+
+              <h4 style="color: #fff; font-size: 1.15rem; font-weight: 700; margin-bottom: 0.35rem;">
+                Tech Talk: Future of Agentic AI
+              </h4>
+              <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+                📍 Seminar Hall 102 (Block S) • Organized by GDSC • 142 Attending
+              </p>
+
+              <div style="display: flex; gap: 0.6rem;">
+                <a href="events.html" class="btn btn-primary btn-sm">View Event</a>
+                <a href="navigation.html?dest=Block%20S" class="btn btn-nav-action btn-sm">Walk to Venue 🚶</a>
+              </div>
+            </div>
+
+            <!-- Next Up Preview -->
+            <div style="margin-top: 1rem; padding: 0.75rem; background: rgba(255, 255, 255, 0.02); border-radius: var(--radius-sm); border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <span style="font-size: 0.72rem; color: var(--text-dim); text-transform: uppercase;">Upcoming Next</span>
+                <div style="font-size: 0.88rem; font-weight: 600; color: #fff;">Campus Freshers Fest: Genesis 2026</div>
+              </div>
+              <span style="font-size: 0.78rem; color: var(--accent-primary);">Oct 24 • Amphitheatre</span>
+            </div>
+          </div>
+
+        </div>
+
+      </main>
+
+      <!-- MOBILE BOTTOM NAVIGATION -->
+      <nav class="mobile-bottom-nav">
+        <a href="index.html" class="bottom-nav-item active">
+          <span class="bottom-nav-icon">🏠</span>
+          <span>Home</span>
+        </a>
+        <a href="navigation.html" class="bottom-nav-item">
+          <span class="bottom-nav-icon">📍</span>
+          <span>Navigate</span>
+        </a>
+        <a href="lost-found.html" class="bottom-nav-item">
+          <span class="bottom-nav-icon">🔎</span>
+          <span>Lost/Found</span>
+        </a>
+        <a href="spaces.html" class="bottom-nav-item">
+          <span class="bottom-nav-icon">🏫</span>
+          <span>Spaces</span>
+        </a>
+        <a href="events.html" class="bottom-nav-item">
+          <span class="bottom-nav-icon">📅</span>
+          <span>Events</span>
+        </a>
+      </nav>
+
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="data/demo-data.js"></script>
+  <script src="js/main.js"></script>
+  <!-- Leaflet Map JS for Mini Preview Map -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script>
+    // Initialize Home Mini Map & Live Ticker
+    document.addEventListener("DOMContentLoaded", () => {
+      // 1. Mini Leaflet Map Preview
+      const miniMapEl = document.getElementById("homeMiniMap");
+      if (miniMapEl && typeof L !== "undefined") {
+        const miniMap = L.map("homeMiniMap", {
+          zoomControl: false,
+          attributionControl: false,
+          dragging: false,
+          scrollWheelZoom: false,
+          doubleClickZoom: false
+        }).setView([31.2542, 75.7036], 16);
+
+        L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+          maxZoom: 19,
+          subdomains: "abcd"
+        }).addTo(miniMap);
+
+        // Add user marker & destination marker on mini map
+        const userIcon = L.divIcon({
+          className: "user-loc-marker",
+          html: `<div class="custom-pulse-marker"></div>`,
+          iconSize: [18, 18],
+          iconAnchor: [9, 9]
+        });
+        L.marker([31.2530, 75.7010], { icon: userIcon }).addTo(miniMap);
+
+        const destIcon = L.divIcon({
+          className: "dest-marker",
+          html: `<div style="font-size: 20px;">📍</div>`,
+          iconSize: [20, 20],
+          iconAnchor: [10, 20]
+        });
+        L.marker([31.2548, 75.7032], { icon: destIcon }).addTo(miniMap);
+
+        // Draw preview route polyline
+        L.polyline([
+          [31.2530, 75.7010],
+          [31.2530, 75.7025],
+          [31.2542, 75.7025],
+          [31.2548, 75.7032]
+        ], {
+          color: "#38bdf8",
+          weight: 4,
+          opacity: 0.85,
+          dashArray: "4, 8"
+        }).addTo(miniMap);
+      }
+
+      // 2. Cycling Live Activity Ticker
+      if (typeof CAMPUS_ACTIVITIES !== "undefined" && CAMPUS_ACTIVITIES.length > 0) {
+        let tickerIndex = 0;
+        const tickerEl = document.getElementById("tickerActiveItem");
+        if (tickerEl) {
+          setInterval(() => {
+            tickerIndex = (tickerIndex + 1) % CAMPUS_ACTIVITIES.length;
+            const item = CAMPUS_ACTIVITIES[tickerIndex];
+            tickerEl.style.opacity = 0;
+            setTimeout(() => {
+              tickerEl.href = item.actionUrl;
+              tickerEl.innerHTML = `
+                <span>${item.icon}</span>
+                <span>${escapeHTML(item.text)}</span>
+                <span class="time-ago">${escapeHTML(item.time)}</span>
+              `;
+              tickerEl.style.opacity = 1;
+            }, 200);
+          }, 4500);
+        }
+      }
+
+      // 3. Global Search Input listener (redirects to relevant section or navigation)
+      const globalSearchInput = document.getElementById("globalSearchInput");
+      if (globalSearchInput) {
+        globalSearchInput.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") {
+            const query = globalSearchInput.value.trim();
+            if (query) {
+              window.location.href = `navigation.html?dest=${encodeURIComponent(query)}`;
+            }
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>

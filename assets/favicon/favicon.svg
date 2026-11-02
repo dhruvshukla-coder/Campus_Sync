@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <defs>
+    <linearGradient id="favGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="50%" stop-color="#6366f1" />
+      <stop offset="100%" stop-color="#a855f7" />
+    </linearGradient>
+  </defs>
+  <rect width="32" height="32" rx="8" fill="#0b132b"/>
+  <!-- Sync Loop -->
+  <path d="M 16 6 A 10 10 0 0 1 26 16 L 23 16 A 7 7 0 0 0 16 9 Z" fill="url(#favGrad)"/>
+  <polygon points="27,13 30,17 24,17" fill="#38bdf8"/>
+  <path d="M 16 26 A 10 10 0 0 1 6 16 L 9 16 A 7 7 0 0 0 16 23 Z" fill="url(#favGrad)"/>
+  <polygon points="5,19 2,15 8,15" fill="#a855f7"/>
+  <!-- Central Cap -->
+  <polygon points="16,11 22,15 16,19 10,15" fill="#38bdf8"/>
+  <path d="M 12 16.5 L 12 19.5 Q 16 22.5 20 19.5 L 20 16.5" fill="none" stroke="#60a5fa" stroke-width="1.3"/>
+</svg>
+

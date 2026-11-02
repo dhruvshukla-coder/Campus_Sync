@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Find a Space — Campus Spaces | CampusSync</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon/favicon.svg">
+  <link rel="stylesheet" href="css/style.css">
+  <!-- Authentication & Access Gate -->
+  <script src="js/auth.js"></script>
+  <script>CampusAuth.requireAuth();</script>
+</head>
+<body>
+
+  <div class="app-layout">
+
+    <!-- DESKTOP SIDEBAR -->
+    <aside class="app-sidebar">
+      <div class="sidebar-header">
+        <a href="index.html" class="sidebar-logo">
+          <div class="sidebar-logo-icon">⚡</div>
+          <span class="sidebar-logo-text">Campus<strong>Sync</strong></span>
+        </a>
+        <button id="sidebarCloseBtn" class="topbar-btn" style="display: none;" aria-label="Close sidebar">&times;</button>
+      </div>
+
+      <div class="sidebar-nav-container">
+        <span class="sidebar-section-title">Navigation</span>
+        <ul class="sidebar-menu">
+          <li>
+            <a href="index.html" class="sidebar-link">
+              <span class="sidebar-link-icon">🏠</span>
+              <span>Home</span>
+            </a>
+          </li>
+          <li>
+            <a href="navigation.html" class="sidebar-link">
+              <span class="sidebar-link-icon">📍</span>
+              <span>Where is your Block?</span>
+              <span class="sidebar-badge badge-live">LIVE</span>
+            </a>
+          </li>
+          <li>
+            <a href="lost-found.html" class="sidebar-link">
+              <span class="sidebar-link-icon">🔎</span>
+              <span>Lost &amp; Found</span>
+            </a>
+          </li>
+          <li>
+            <a href="spaces.html" class="sidebar-link active">
+              <span class="sidebar-link-icon">🏫</span>
+              <span>Spaces</span>
+              <span class="sidebar-badge badge-count">2 EMPTY</span>
+            </a>
+          </li>
+          <li>
+            <a href="events.html" class="sidebar-link">
+              <span class="sidebar-link-icon">📅</span>
+              <span>Events</span>
+              <span class="sidebar-badge badge-live">1 LIVE</span>
+            </a>
+          </li>
+          <li>
+            <a href="navigation.html" class="sidebar-link">
+              <span class="sidebar-link-icon">🗺️</span>
+              <span>Campus Map</span>
+            </a>
+          </li>
+        </ul>
+
+        <span class="sidebar-section-title">Smart Availability</span>
+        <div class="sidebar-pulse-card">
+          <div class="pulse-header">
+            <span class="pulse-dot"></span>
+            <span>Study Space Engine</span>
+          </div>
+          <p class="pulse-info">
+            • Empty Classrooms tracked<br>
+            • Occupancy &amp; Noise meters<br>
+            • Hourly availability bars
+          </p>
+        </div>
+      </div>
+
+      <div class="sidebar-footer">
+        <a href="#" class="sidebar-user profile-trigger-btn" title="View Student Profile">
+          <div class="user-avatar user-initials">--</div>
+          <div class="user-info">
+            <div class="user-name">Student</div>
+            <div class="user-dept user-reg-no">--</div>
+          </div>
+        </a>
+        <div class="sidebar-footer-actions">
+          <button type="button" class="logout-btn" title="Sign out / Logout" onclick="if(typeof CampusAuth!=='undefined'){CampusAuth.logout();}else{try{localStorage.removeItem('campussync_current_session');localStorage.removeItem('campussync_user_profile');}catch(e){}window.location.href='login.html';}">🚪</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN WRAPPER -->
+    <div class="app-main">
+
+      <!-- MOBILE TOP HEADER BAR -->
+      <header class="mobile-header-bar">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <button id="mobileMenuBtn" class="topbar-btn">☰</button>
+          <a href="index.html" class="sidebar-logo">
+            <span class="sidebar-logo-text">Campus<strong>Sync</strong></span>
+          </a>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <button class="topbar-btn notif-toggle-btn">
+            <span>🔔</span>
+            <span class="notif-badge-pill" style="display: none;">0</span>
+          </button>
+          <button class="topbar-btn profile-trigger-btn">
+            <span>👤</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- NOTIFICATIONS DROPDOWN -->
+      <div class="notif-dropdown" id="notifDropdown">
+        <div class="notif-header">
+          <h4 style="margin: 0; font-size: 0.95rem; color: #fff;">CampusSync Notifications</h4>
+          <button class="btn btn-outline btn-sm" id="clearNotifsBtn" style="padding: 0.2rem 0.5rem; font-size: 0.72rem;">Clear</button>
+        </div>
+        <div class="notif-list" id="notifList"></div>
+      </div>
+
+      <!-- MAIN CONTENT -->
+      <main class="page-content-wrapper">
+
+        <div style="margin-bottom: 2rem;">
+          <span class="badge badge-primary" style="margin-bottom: 0.4rem;">Feature 4 • Quiet Spaces &amp; Empty Classrooms</span>
+          <h1 style="color: #fff; font-size: 2rem; font-weight: 800; margin-bottom: 0.35rem;">Find a Space</h1>
+          <p style="color: var(--text-muted); font-size: 0.95rem;">Discover quiet, empty and less-crowded places around campus.</p>
+        </div>
+
+        <!-- ========================================================
+             SMART SPACE RECOMMENDATION: BEST MATCH RIGHT NOW
+             ======================================================== -->
+        <section class="spaces-feature-block">
+          <div style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(15, 23, 42, 0.9) 100%); border: 1px solid rgba(99, 102, 241, 0.4); border-radius: var(--card-radius); padding: 1.5rem 1.75rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1.25rem;">
+            <div>
+              <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.4rem;">
+                <span class="badge badge-purple">⭐ Best Match Right Now</span>
+                <span style="font-size: 0.8rem; color: var(--accent-primary);">Based on crowd level, noise &amp; walk time</span>
+              </div>
+              <h3 style="color: #fff; font-size: 1.35rem; font-weight: 800; margin-bottom: 0.3rem;">Block S Study Hall</h3>
+              <div style="display: flex; flex-wrap: wrap; gap: 1rem; font-size: 0.85rem; color: var(--text-muted);">
+                <span>👥 <strong style="color: #34d399;">8 / 40 occupied (20%)</strong></span>
+                <span>🤫 <strong style="color: #fff;">Very quiet</strong></span>
+                <span>🚶 <strong style="color: #7dd3fc;">6 min walk (450m)</strong></span>
+                <span>🕒 <strong style="color: #fff;">Available for 2h 15m</strong></span>
+              </div>
+            </div>
+            <a href="navigation.html?dest=Block%20S" class="btn btn-primary">
+              <span>📍</span> Navigate &rarr;
+            </a>
+          </div>
+        </section>
+
+        <!-- ========================================================
+             MAJOR FEATURE: EMPTY CLASSROOMS SECTION
+             ======================================================== -->
+        <section class="spaces-feature-block">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
+            <div style="display: flex; align-items: center; gap: 0.6rem;">
+              <span style="font-size: 1.4rem;">🟢</span>
+              <h2 style="color: #fff; font-size: 1.4rem; font-weight: 800; margin: 0;">Empty Classrooms Right Now</h2>
+            </div>
+            <span class="badge badge-emerald">Verified Available</span>
+          </div>
+
+          <div class="empty-classrooms-grid">
+            <!-- Room 1: Block S Room 204 -->
+            <div class="empty-classroom-card">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                  <span class="empty-classroom-badge">🟢 EMPTY NOW</span>
+                  <h3 class="empty-room-title" style="margin-top: 0.4rem;">Block S — Room 204</h3>
+                  <div style="font-size: 0.82rem; color: var(--text-muted);">📍 2nd Floor West Wing • Academic Block</div>
+                </div>
+                <div style="text-align: right;">
+                  <div style="font-size: 1.1rem; font-weight: 800; color: #34d399;">0 / 60</div>
+                  <div style="font-size: 0.72rem; color: var(--text-dim);">OCCUPANCY</div>
+                </div>
+              </div>
+
+              <!-- Hourly Availability Timeline -->
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-dim); margin-bottom: 0.25rem;">
+                  <span>Availability Timeline:</span>
+                  <strong style="color: #34d399;">Available: 6:00 PM – 8:00 PM</strong>
+                </div>
+                <div class="room-timeline-bar">
+                  <div class="timeline-slot slot-empty">Now (0/60)</div>
+                  <div class="timeline-slot slot-empty">6 PM (Free)</div>
+                  <div class="timeline-slot slot-empty">7 PM (Free)</div>
+                  <div class="timeline-slot slot-busy">8 PM (Class)</div>
+                  <div class="timeline-slot slot-empty">9 PM (Free)</div>
+                </div>
+              </div>
+
+              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <span class="facility-pill">✓ Wi-Fi</span>
+                <span class="facility-pill">✓ Dual Projectors</span>
+                <span class="facility-pill">✓ AC</span>
+                <span class="facility-pill">✓ Power Outlets</span>
+              </div>
+
+              <div style="display: flex; gap: 0.75rem; margin-top: 0.5rem;">
+                <button class="btn btn-secondary btn-sm inspect-space-btn" data-id="space-block-s-204" style="flex: 1;">
+                  View Room
+                </button>
+                <a href="navigation.html?dest=Block%20S" class="btn btn-nav-action btn-sm">
+                  <span>📍</span> Walk to Block S
+                </a>
+              </div>
+            </div>
+
+            <!-- Room 2: Block 32 Room 301 -->
+            <div class="empty-classroom-card">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                  <span class="empty-classroom-badge">🟢 EMPTY NOW</span>
+                  <h3 class="empty-room-title" style="margin-top: 0.4rem;">Block 32 — Room 301</h3>
+                  <div style="font-size: 0.82rem; color: var(--text-muted);">📍 3rd Floor East • Engineering Block</div>
+                </div>
+                <div style="text-align: right;">
+                  <div style="font-size: 1.1rem; font-weight: 800; color: #34d399;">0 / 45</div>
+                  <div style="font-size: 0.72rem; color: var(--text-dim);">OCCUPANCY</div>
+                </div>
+              </div>
+
+              <!-- Hourly Availability Timeline -->
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-dim); margin-bottom: 0.25rem;">
+                  <span>Availability Timeline:</span>
+                  <strong style="color: #34d399;">Available: 7:00 PM – 9:00 PM</strong>
+                </div>
+                <div class="room-timeline-bar">
+                  <div class="timeline-slot slot-empty">Now (Empty)</div>
+                  <div class="timeline-slot slot-empty">7 PM (Free)</div>
+                  <div class="timeline-slot slot-empty">8 PM (Free)</div>
+                  <div class="timeline-slot slot-busy">9 PM (Maint.)</div>
+                </div>
+              </div>
+
+              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <span class="facility-pill">✓ Tiered Desks</span>
+                <span class="facility-pill">✓ Power at every seat</span>
+                <span class="facility-pill">✓ AC</span>
+                <span class="facility-pill">✓ Quiet</span>
+              </div>
+
+              <div style="display: flex; gap: 0.75rem; margin-top: 0.5rem;">
+                <button class="btn btn-secondary btn-sm inspect-space-btn" data-id="space-block-32-301" style="flex: 1;">
+                  View Room
+                </button>
+                <a href="navigation.html?dest=Block%2032" class="btn btn-nav-action btn-sm">
+                  <span>📍</span> Walk to Block 32
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========================================================
+             SEARCH & FILTER CONTROLS FOR ALL SPACES
+             ======================================================== -->
+        <div class="filter-toolbar-card">
+          <div class="filter-search-row">
+            <div class="filter-search-box">
+              <span style="position: absolute; left: 0.85rem; color: var(--text-dim);">🔍</span>
+              <input
+                type="text"
+                id="spaceSearchInput"
+                placeholder="Search campus spaces by name, facilities (WiFi, AC, Charging), or tasks..."
+                autocomplete="off"
+              >
+            </div>
+          </div>
+
+          <div class="filter-pills-row">
+            <!-- Category pills -->
+            <div class="filter-type-segmented" id="spaceCategoryPills">
+              <button class="filter-segment-btn active" data-category="all">All Spaces</button>
+              <button class="filter-segment-btn" data-category="Study">Study</button>
+              <button class="filter-segment-btn" data-category="Classroom">Classroom</button>
+              <button class="filter-segment-btn" data-category="Library">Library</button>
+              <button class="filter-segment-btn" data-category="Computer Lab">Lab</button>
+              <button class="filter-segment-btn" data-category="Hall">Hall</button>
+              <button class="filter-segment-btn" data-category="Outdoor">Outdoor</button>
+            </div>
+
+            <!-- Availability filter dropdown -->
+            <div class="select-filters-group">
+              <select id="spaceAvailabilitySelect" class="select-filter-input">
+                <option value="all">All Availabilities</option>
+                <option value="Available">Available Now</option>
+                <option value="Low">Almost Empty</option>
+                <option value="Moderately">Moderately Busy</option>
+                <option value="Busy">Peak / Busy</option>
+              </select>
+
+              <button id="spaceResetFiltersBtn" class="btn btn-outline btn-sm">Reset</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================================
+             ALL CAMPUS SPACES DIRECTORY GRID
+             ======================================================== -->
+        <section class="spaces-feature-block">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <h2 style="color: #fff; font-size: 1.4rem; font-weight: 700;">Campus Study Spaces (<span id="spacesCounter">0</span>)</h2>
+            <span style="font-size: 0.85rem; color: var(--text-muted);" id="spacesFilterMeta">Showing all campus zones</span>
+          </div>
+
+          <div class="spaces-grid" id="spacesGridContainer">
+            <!-- Rendered by js/spaces.js -->
+          </div>
+
+          <!-- Empty state -->
+          <div id="spacesEmptyState" style="display: none; text-align: center; padding: 4rem 1rem; background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--card-radius);">
+            <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">🏢</div>
+            <h3 style="color: #fff; font-size: 1.2rem; margin-bottom: 0.5rem;">No spaces match your criteria</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.25rem;">Try selecting a different category or clearing search terms.</p>
+            <button class="btn btn-secondary" onclick="document.getElementById('spaceResetFiltersBtn').click()">Reset Space Filters</button>
+          </div>
+        </section>
+
+      </main>
+
+      <!-- MOBILE BOTTOM NAVIGATION -->
+      <nav class="mobile-bottom-nav">
+        <a href="index.html" class="bottom-nav-item">
+          <span class="bottom-nav-icon">🏠</span>
+          <span>Home</span>
+        </a>
+        <a href="navigation.html" class="bottom-nav-item">
+          <span class="bottom-nav-icon">📍</span>
+          <span>Navigate</span>
+        </a>
+        <a href="lost-found.html" class="bottom-nav-item">
+          <span class="bottom-nav-icon">🔎</span>
+          <span>Lost/Found</span>
+        </a>
+        <a href="spaces.html" class="bottom-nav-item active">
+          <span class="bottom-nav-icon">🏫</span>
+          <span>Spaces</span>
+        </a>
+        <a href="events.html" class="bottom-nav-item">
+          <span class="bottom-nav-icon">📅</span>
+          <span>Events</span>
+        </a>
+      </nav>
+
+    </div>
+  </div>
+
+  <!-- ========================================================
+       SPACE DETAILS & TIMELINE MODAL
+       ======================================================== -->
+  <div class="custom-modal" id="spaceDetailsModal" role="dialog" aria-label="Space details">
+    <div class="modal-dialog" style="max-width: 680px;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 0.6rem;">
+          <span id="modalSpaceBadge" class="badge badge-primary">Library</span>
+          <span id="modalSpaceCrowdBadge" class="badge badge-emerald">Low Crowd</span>
+        </div>
+        <button class="modal-close" id="closeSpaceModalBtn">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div style="width: 100%; height: 230px; border-radius: var(--radius-md); overflow: hidden; background: #070c18;">
+          <img id="modalSpaceImg" src="" alt="Space" style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+
+        <div>
+          <h2 id="modalSpaceTitle" style="color: #fff; font-size: 1.4rem; font-weight: 800; margin-bottom: 0.2rem;">Central Library — Silent Zone</h2>
+          <div style="font-size: 0.85rem; color: var(--text-muted);" id="modalSpaceLocation">📍 Central Library, 2nd Floor</div>
+        </div>
+
+        <!-- Occupancy Bar Card -->
+        <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1rem;">
+          <div style="display: flex; justify-content: space-between; font-size: 0.88rem; font-weight: 600; color: #fff;">
+            <span>Current Occupancy:</span>
+            <span id="modalSpaceOccupancyText">18 / 60 people (30%)</span>
+          </div>
+          <div class="occupancy-meter-bg">
+            <div id="modalOccupancyMeterFill" class="occupancy-meter-fill meter-green" style="width: 30%;"></div>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--text-dim); margin-top: 0.5rem;">
+            <span>Noise Rating: <strong id="modalSpaceNoise" style="color: #fff;">Whisper Quiet</strong></span>
+            <span>Available until: <strong id="modalSpaceUntil" style="color: #38bdf8;">11:30 PM</strong></span>
+          </div>
+        </div>
+
+        <!-- Hourly Availability Timeline -->
+        <div>
+          <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.4rem;">
+            <strong style="color: #fff;">Availability Timeline</strong>
+            <span id="modalTimelineUntilText" style="color: #34d399; font-size: 0.8rem; font-weight: 600;">Available Now</span>
+          </div>
+          <div class="room-timeline-bar" id="modalTimelineSlotsContainer"></div>
+        </div>
+
+        <!-- Facilities -->
+        <div>
+          <div style="font-size: 0.82rem; color: var(--text-dim); margin-bottom: 0.4rem;">AMENITIES &amp; FACILITIES</div>
+          <div class="space-facilities-pills" id="modalSpaceFacilities"></div>
+        </div>
+
+        <div>
+          <div style="font-size: 0.82rem; color: var(--text-dim); margin-bottom: 0.3rem;">BEST SUITED FOR</div>
+          <p id="modalSpaceSuitableFor" style="font-size: 0.88rem; color: var(--text-secondary);"></p>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="modalSpaceBookmarkBtn">🔖 Bookmark Space</button>
+        <!-- Deep link to Feature 1 Navigation! -->
+        <button class="btn btn-primary" id="modalSpaceNavigateBtn">
+          <span>📍</span> Navigate Here &rarr;
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="data/demo-data.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/spaces.js"></script>
+</body>
+</html>

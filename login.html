@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CampusSync — Student Portal Login</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon/favicon.svg">
+  <!-- Core Design System -->
+  <link rel="stylesheet" href="css/style.css">
+  <!-- Dedicated Auth Styles -->
+  <link rel="stylesheet" href="css/auth.css">
+
+  <!-- Core Auth & Route Guard -->
+  <script src="js/auth.js"></script>
+  <script>
+    // If user is already authenticated, take them directly to the main app
+    CampusAuth.redirectIfLoggedIn();
+  </script>
+</head>
+<body class="auth-body">
+
+  <!-- Background Ambient Glow & Grid -->
+  <div class="auth-glow-orb auth-glow-1"></div>
+  <div class="auth-glow-orb auth-glow-2"></div>
+  <div class="auth-grid-overlay"></div>
+
+  <!-- Main Auth Card Container -->
+  <main class="auth-container">
+    <div class="auth-card">
+
+      <!-- Header & CampusSync Branding -->
+      <div class="auth-header">
+        <div class="auth-brand-logo">
+          <div class="logo-icon">⚡</div>
+          <span>Campus<strong>Sync</strong></span>
+        </div>
+        <div style="display: flex; justify-content: center;">
+          <div class="auth-portal-badge">
+            <span class="badge-dot"></span>
+            <span>Lovely Professional University</span>
+          </div>
+        </div>
+        <p class="auth-subtitle">UMS Student Access &amp; Navigation Portal</p>
+      </div>
+
+      <!-- Segmented Two-Tab Navigation -->
+      <div class="auth-tabs" role="tablist">
+        <button type="button" class="auth-tab-btn active" id="tabLoginBtn" role="tab" aria-selected="true" aria-controls="loginPanel">
+          <span>🔐</span> Sign In
+        </button>
+        <button type="button" class="auth-tab-btn" id="tabSignupBtn" role="tab" aria-selected="false" aria-controls="signupPanel">
+          <span>✨</span> Sign Up
+        </button>
+      </div>
+
+      <div class="auth-panels-wrapper">
+
+        <!-- ============================================================ -->
+        <!-- 1. LOGIN TAB PANEL -->
+        <!-- ============================================================ -->
+        <section id="loginPanel" class="auth-panel active" role="tabpanel" aria-labelledby="tabLoginBtn">
+          <!-- Error alert banner -->
+          <div id="loginAlert" class="auth-alert" role="alert">
+            <span class="auth-alert-icon">⚠️</span>
+            <span id="loginAlertMsg">Invalid credentials</span>
+          </div>
+
+          <form id="loginForm" autocomplete="on" novalidate>
+            <!-- Identifier (Email or Reg No) -->
+            <div class="auth-form-group">
+              <label class="form-label" for="loginIdentifier">
+                <span>University Email ID or Reg. No.</span>
+                <span class="label-hint">8 digits or @lpu.in</span>
+              </label>
+              <div class="auth-input-wrapper">
+                <span class="auth-input-icon">👤</span>
+                <input 
+                  type="text" 
+                  id="loginIdentifier" 
+                  name="username" 
+                  class="auth-input" 
+                  placeholder="e.g. 12104567 or student@lpu.in"
+                  autocomplete="username" 
+                  required
+                >
+              </div>
+            </div>
+
+            <!-- Password -->
+            <div class="auth-form-group">
+              <label class="form-label" for="loginPassword">
+                <span>Password</span>
+              </label>
+              <div class="auth-input-wrapper">
+                <span class="auth-input-icon">🔒</span>
+                <input 
+                  type="password" 
+                  id="loginPassword" 
+                  name="password" 
+                  class="auth-input" 
+                  placeholder="Enter your password"
+                  autocomplete="current-password" 
+                  required
+                >
+                <button type="button" class="auth-pwd-toggle" id="toggleLoginPwd" aria-label="Toggle password visibility" title="Show/Hide password">
+                  👁️
+                </button>
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" id="loginSubmitBtn" class="btn btn-primary auth-submit-btn">
+              <span>Sign In to CampusSync</span>
+              <span>→</span>
+            </button>
+          </form>
+
+          <!-- Quick Fill Demo Account helper -->
+          <div class="auth-demo-box">
+            <div class="auth-demo-header">
+              <span class="auth-demo-title">💡 Instant Demo Account</span>
+              <button type="button" id="fillDemoBtn" class="auth-demo-btn">Auto-Fill</button>
+            </div>
+            <p class="auth-demo-text">
+              Reg: <code>12104567</code> / Pass: <code>Password@123</code><br>
+              Email: <code>anukalp.shukla@lpu.in</code>
+            </p>
+          </div>
+
+          <div class="auth-switch-link">
+            Don't have an account? <a href="#" id="linkToSignup">Create Account</a>
+          </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- 2. SIGN UP TAB PANEL -->
+        <!-- ============================================================ -->
+        <section id="signupPanel" class="auth-panel" role="tabpanel" aria-labelledby="tabSignupBtn">
+          <!-- Error alert banner -->
+          <div id="signupAlert" class="auth-alert" role="alert">
+            <span class="auth-alert-icon">⚠️</span>
+            <span id="signupAlertMsg">Registration error</span>
+          </div>
+
+          <form id="signupForm" autocomplete="on" novalidate>
+            <!-- Full Name -->
+            <div class="auth-form-group">
+              <label class="form-label" for="signupFullName">
+                <span>Full Name <span style="color: var(--accent-rose);">*</span></span>
+                <span class="label-hint">Min. 3 letters</span>
+              </label>
+              <div class="auth-input-wrapper">
+                <span class="auth-input-icon">📝</span>
+                <input 
+                  type="text" 
+                  id="signupFullName" 
+                  name="name" 
+                  class="auth-input" 
+                  placeholder="e.g. Rahul Sharma" 
+                  minlength="3" 
+                  autocomplete="name" 
+                  required
+                >
+              </div>
+            </div>
+
+            <!-- University Email ID -->
+            <div class="auth-form-group">
+              <label class="form-label" for="signupEmail">
+                <span>University Email ID <span style="color: var(--accent-rose);">*</span></span>
+                <span class="label-hint" id="domainHint">Must end with @lpu.in</span>
+              </label>
+              <div class="auth-input-wrapper">
+                <span class="auth-input-icon">✉️</span>
+                <input 
+                  type="email" 
+                  id="signupEmail" 
+                  name="email" 
+                  class="auth-input" 
+                  placeholder="student.12104567@lpu.in" 
+                  autocomplete="email" 
+                  required
+                >
+              </div>
+            </div>
+
+            <!-- Registration Number -->
+            <div class="auth-form-group">
+              <label class="form-label" for="signupRegNo">
+                <span>Registration Number <span style="color: var(--accent-rose);">*</span></span>
+                <span class="label-hint">Exactly 8 digits</span>
+              </label>
+              <div class="auth-input-wrapper">
+                <span class="auth-input-icon">🎓</span>
+                <input 
+                  type="text" 
+                  id="signupRegNo" 
+                  name="regNo" 
+                  class="auth-input" 
+                  placeholder="e.g. 12104567" 
+                  inputmode="numeric" 
+                  maxlength="8" 
+                  required
+                >
+              </div>
+            </div>
+
+            <!-- Password -->
+            <div class="auth-form-group">
+              <label class="form-label" for="signupPassword">
+                <span>Password <span style="color: var(--accent-rose);">*</span></span>
+                <span class="label-hint">Min. 6 chars</span>
+              </label>
+              <div class="auth-input-wrapper">
+                <span class="auth-input-icon">🔒</span>
+                <input 
+                  type="password" 
+                  id="signupPassword" 
+                  name="new-password" 
+                  class="auth-input" 
+                  placeholder="Create a strong password" 
+                  autocomplete="new-password" 
+                  minlength="6" 
+                  required
+                >
+                <button type="button" class="auth-pwd-toggle" id="toggleSignupPwd" aria-label="Toggle password visibility" title="Show/Hide password">
+                  👁️
+                </button>
+              </div>
+            </div>
+
+            <!-- Confirm Password -->
+            <div class="auth-form-group">
+              <label class="form-label" for="signupConfirmPassword">
+                <span>Confirm Password <span style="color: var(--accent-rose);">*</span></span>
+              </label>
+              <div class="auth-input-wrapper">
+                <span class="auth-input-icon">🔐</span>
+                <input 
+                  type="password" 
+                  id="signupConfirmPassword" 
+                  name="confirm-password" 
+                  class="auth-input" 
+                  placeholder="Re-enter password" 
+                  autocomplete="new-password" 
+                  minlength="6" 
+                  required
+                >
+                <button type="button" class="auth-pwd-toggle" id="toggleSignupConfirmPwd" aria-label="Toggle password visibility" title="Show/Hide password">
+                  👁️
+                </button>
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" id="signupSubmitBtn" class="btn btn-primary auth-submit-btn">
+              <span>Complete Registration</span>
+              <span>✨</span>
+            </button>
+          </form>
+
+          <div class="auth-switch-link">
+            Already registered? <a href="#" id="linkToLogin">Sign In</a>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </main>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // Elements
+      const tabLoginBtn = document.getElementById("tabLoginBtn");
+      const tabSignupBtn = document.getElementById("tabSignupBtn");
+      const loginPanel = document.getElementById("loginPanel");
+      const signupPanel = document.getElementById("signupPanel");
+
+      const loginForm = document.getElementById("loginForm");
+      const loginAlert = document.getElementById("loginAlert");
+      const loginAlertMsg = document.getElementById("loginAlertMsg");
+      const loginSubmitBtn = document.getElementById("loginSubmitBtn");
+
+      const signupForm = document.getElementById("signupForm");
+      const signupAlert = document.getElementById("signupAlert");
+      const signupAlertMsg = document.getElementById("signupAlertMsg");
+      const signupSubmitBtn = document.getElementById("signupSubmitBtn");
+
+      const linkToSignup = document.getElementById("linkToSignup");
+      const linkToLogin = document.getElementById("linkToLogin");
+      const fillDemoBtn = document.getElementById("fillDemoBtn");
+
+      // Password toggles
+      setupPasswordToggle("loginPassword", "toggleLoginPwd");
+      setupPasswordToggle("signupPassword", "toggleSignupPwd");
+      setupPasswordToggle("signupConfirmPassword", "toggleSignupConfirmPwd");
+
+      // Reflect configured domain in UI
+      const domain = (CampusAuth && CampusAuth.CONFIG && CampusAuth.CONFIG.UNIVERSITY_EMAIL_DOMAIN) || "@lpu.in";
+      const domainHint = document.getElementById("domainHint");
+      if (domainHint) {
+        domainHint.textContent = `Must end with ${domain}`;
+      }
+      const signupEmail = document.getElementById("signupEmail");
+      if (signupEmail) {
+        signupEmail.placeholder = `student.12104567${domain}`;
+      }
+
+      // Tab Switching
+      function switchTab(target) {
+        hideAlerts();
+        if (target === "signup") {
+          tabSignupBtn.classList.add("active");
+          tabSignupBtn.setAttribute("aria-selected", "true");
+          tabLoginBtn.classList.remove("active");
+          tabLoginBtn.setAttribute("aria-selected", "false");
+          signupPanel.classList.add("active");
+          loginPanel.classList.remove("active");
+          const firstInput = document.getElementById("signupFullName");
+          if (firstInput) firstInput.focus();
+        } else {
+          tabLoginBtn.classList.add("active");
+          tabLoginBtn.setAttribute("aria-selected", "true");
+          tabSignupBtn.classList.remove("active");
+          tabSignupBtn.setAttribute("aria-selected", "false");
+          loginPanel.classList.add("active");
+          signupPanel.classList.remove("active");
+          const firstInput = document.getElementById("loginIdentifier");
+          if (firstInput) firstInput.focus();
+        }
+      }
+
+      tabLoginBtn.addEventListener("click", () => switchTab("login"));
+      tabSignupBtn.addEventListener("click", () => switchTab("signup"));
+      linkToSignup.addEventListener("click", (e) => {
+        e.preventDefault();
+        switchTab("signup");
+      });
+      linkToLogin.addEventListener("click", (e) => {
+        e.preventDefault();
+        switchTab("login");
+      });
+
+      // Quick Demo Fill
+      if (fillDemoBtn) {
+        fillDemoBtn.addEventListener("click", () => {
+          document.getElementById("loginIdentifier").value = "12104567";
+          document.getElementById("loginPassword").value = "Password@123";
+          hideAlerts();
+        });
+      }
+
+      // Helper: Show Error Alert
+      function showLoginAlert(msg) {
+        loginAlertMsg.textContent = msg;
+        loginAlert.classList.add("visible");
+      }
+      function showSignupAlert(msg) {
+        signupAlertMsg.textContent = msg;
+        signupAlert.classList.add("visible");
+      }
+      function hideAlerts() {
+        loginAlert.classList.remove("visible");
+        signupAlert.classList.remove("visible");
+      }
+
+      // Password Toggle Setup
+      function setupPasswordToggle(inputId, toggleBtnId) {
+        const input = document.getElementById(inputId);
+        const btn = document.getElementById(toggleBtnId);
+        if (!input || !btn) return;
+
+        btn.addEventListener("click", () => {
+          const isPassword = input.type === "password";
+          input.type = isPassword ? "text" : "password";
+          btn.textContent = isPassword ? "🙈" : "👁️";
+        });
+      }
+
+      // Registration Number input restriction (only numeric digits)
+      const regInput = document.getElementById("signupRegNo");
+      if (regInput) {
+        regInput.addEventListener("input", (e) => {
+          e.target.value = e.target.value.replace(/\D/g, "").slice(0, 8);
+        });
+      }
+
+      // -------------------------------------------------------------
+      // LOGIN SUBMISSION
+      // -------------------------------------------------------------
+      loginForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        hideAlerts();
+
+        const identifier = document.getElementById("loginIdentifier").value.trim();
+        const password = document.getElementById("loginPassword").value;
+
+        if (!identifier) {
+          showLoginAlert("Please enter your University Email ID or Registration Number.");
+          document.getElementById("loginIdentifier").focus();
+          return;
+        }
+
+        if (!password) {
+          showLoginAlert("Please enter your password.");
+          document.getElementById("loginPassword").focus();
+          return;
+        }
+
+        loginSubmitBtn.disabled = true;
+        loginSubmitBtn.innerHTML = `<span>Signing in...</span>`;
+
+        try {
+          const result = await CampusAuth.login({ identifier, password });
+
+          if (result.success) {
+            loginSubmitBtn.innerHTML = `<span>Access Granted! Redirecting...</span> ✨`;
+            loginSubmitBtn.style.background = "linear-gradient(135deg, #10b981 0%, #059669 100%)";
+            setTimeout(() => {
+              window.location.replace("index.html");
+            }, 300);
+          } else {
+            showLoginAlert(result.error || "Login failed. Please verify credentials.");
+            loginSubmitBtn.disabled = false;
+            loginSubmitBtn.innerHTML = `<span>Sign In to CampusSync</span> <span>→</span>`;
+          }
+        } catch (err) {
+          console.error("Login exception:", err);
+          showLoginAlert("An unexpected error occurred. Please try again.");
+          loginSubmitBtn.disabled = false;
+          loginSubmitBtn.innerHTML = `<span>Sign In to CampusSync</span> <span>→</span>`;
+        }
+      });
+
+      // -------------------------------------------------------------
+      // SIGN UP SUBMISSION
+      // -------------------------------------------------------------
+      signupForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        hideAlerts();
+
+        const fullName = document.getElementById("signupFullName").value.trim();
+        const email = document.getElementById("signupEmail").value.trim();
+        const regNo = document.getElementById("signupRegNo").value.trim();
+        const password = document.getElementById("signupPassword").value;
+        const confirmPassword = document.getElementById("signupConfirmPassword").value;
+
+        if (!fullName || fullName.length < 3) {
+          showSignupAlert("Full Name is required (minimum 3 characters).");
+          document.getElementById("signupFullName").focus();
+          return;
+        }
+
+        if (!email) {
+          showSignupAlert("University Email ID is required.");
+          document.getElementById("signupEmail").focus();
+          return;
+        }
+
+        if (!email.toLowerCase().endsWith(domain.toLowerCase())) {
+          showSignupAlert(`University Email ID must end with ${domain}`);
+          document.getElementById("signupEmail").focus();
+          return;
+        }
+
+        if (!regNo || regNo.length !== 8) {
+          showSignupAlert("Registration Number must be exactly 8 digits.");
+          document.getElementById("signupRegNo").focus();
+          return;
+        }
+
+        if (!password || password.length < 6) {
+          showSignupAlert("Password must be at least 6 characters long.");
+          document.getElementById("signupPassword").focus();
+          return;
+        }
+
+        if (password !== confirmPassword) {
+          showSignupAlert("Passwords do not match. Please re-enter.");
+          document.getElementById("signupConfirmPassword").focus();
+          return;
+        }
+
+        signupSubmitBtn.disabled = true;
+        signupSubmitBtn.innerHTML = `<span>Creating Account...</span>`;
+
+        try {
+          const result = await CampusAuth.signup({
+            fullName,
+            email,
+            regNo,
+            password,
+            confirmPassword
+          });
+
+          if (result.success) {
+            signupSubmitBtn.innerHTML = `<span>Account Created! Welcome!</span> 🚀`;
+            signupSubmitBtn.style.background = "linear-gradient(135deg, #10b981 0%, #059669 100%)";
+            setTimeout(() => {
+              window.location.replace("index.html");
+            }, 300);
+          } else {
+            showSignupAlert(result.error || "Registration failed.");
+            signupSubmitBtn.disabled = false;
+            signupSubmitBtn.innerHTML = `<span>Complete Registration</span> <span>✨</span>`;
+          }
+        } catch (err) {
+          console.error("Signup exception:", err);
+          showSignupAlert("An unexpected error occurred. Please try again.");
+          signupSubmitBtn.disabled = false;
+          signupSubmitBtn.innerHTML = `<span>Complete Registration</span> <span>✨</span>`;
+        }
+      });
+    });
+  </script>
+</body>
+</html>
+

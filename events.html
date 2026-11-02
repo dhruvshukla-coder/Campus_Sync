@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Campus Events — CampusSync</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon/favicon.svg">
+  <link rel="stylesheet" href="css/style.css">
+  <!-- Authentication & Access Gate -->
+  <script src="js/auth.js"></script>
+  <script>CampusAuth.requireAuth();</script>
+</head>
+<body>
+
+  <div class="app-layout">
+
+    <!-- DESKTOP SIDEBAR -->
+    <aside class="app-sidebar">
+      <div class="sidebar-header">
+        <a href="index.html" class="sidebar-logo">
+          <div class="sidebar-logo-icon">⚡</div>
+          <span class="sidebar-logo-text">Campus<strong>Sync</strong></span>
+        </a>
+        <button id="sidebarCloseBtn" class="topbar-btn" style="display: none;" aria-label="Close sidebar">&times;</button>
+      </div>
+
+      <div class="sidebar-nav-container">
+        <span class="sidebar-section-title">Navigation</span>
+        <ul class="sidebar-menu">
+          <li>
+            <a href="index.html" class="sidebar-link">
+              <span class="sidebar-link-icon">🏠</span>
+              <span>Home</span>
+            </a>
+          </li>
+          <li>
+            <a href="navigation.html" class="sidebar-link">
+              <span class="sidebar-link-icon">📍</span>
+              <span>Where is your Block?</span>
+              <span class="sidebar-badge badge-live">LIVE</span>
+            </a>
+          </li>
+          <li>
+            <a href="lost-found.html" class="sidebar-link">
+              <span class="sidebar-link-icon">🔎</span>
+              <span>Lost &amp; Found</span>
+            </a>
+          </li>
+          <li>
+            <a href="spaces.html" class="sidebar-link">
+              <span class="sidebar-link-icon">🏫</span>
+              <span>Spaces</span>
+            </a>
+          </li>
+          <li>
+            <a href="events.html" class="sidebar-link active">
+              <span class="sidebar-link-icon">📅</span>
+              <span>Events</span>
+              <span class="sidebar-badge badge-live">1 LIVE</span>
+            </a>
+          </li>
+          <li>
+            <a href="navigation.html" class="sidebar-link">
+              <span class="sidebar-link-icon">🗺️</span>
+              <span>Campus Map</span>
+            </a>
+          </li>
+        </ul>
+
+        <span class="sidebar-section-title">Campus Pulse</span>
+        <div class="sidebar-pulse-card">
+          <div class="pulse-header">
+            <span class="pulse-dot" style="background: var(--accent-rose); box-shadow: 0 0 8px var(--accent-rose);"></span>
+            <span style="color: #fb7185;">1 Live Event Now</span>
+          </div>
+          <p class="pulse-info">
+            • AI Tech Talk in Seminar Hall<br>
+            • 142 Active RSVPs<br>
+            • Free student entry
+          </p>
+        </div>
+      </div>
+
+      <div class="sidebar-footer">
+        <a href="#" class="sidebar-user profile-trigger-btn" title="View Student Profile">
+          <div class="user-avatar user-initials">--</div>
+          <div class="user-info">
+            <div class="user-name">Student</div>
+            <div class="user-dept user-reg-no">--</div>
+          </div>
+        </a>
+        <div class="sidebar-footer-actions">
+          <button type="button" class="logout-btn" title="Sign out / Logout" onclick="if(typeof CampusAuth!=='undefined'){CampusAuth.logout();}else{try{localStorage.removeItem('campussync_current_session');localStorage.removeItem('campussync_user_profile');}catch(e){}window.location.href='login.html';}">🚪</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN WRAPPER -->
+    <div class="app-main">
+
+      <!-- MOBILE TOP HEADER BAR -->
+      <header class="mobile-header-bar">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <button id="mobileMenuBtn" class="topbar-btn">☰</button>
+          <a href="index.html" class="sidebar-logo">
+            <span class="sidebar-logo-text">Campus<strong>Sync</strong></span>
+          </a>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <button class="topbar-btn notif-toggle-btn">
+            <span>🔔</span>
+            <span class="notif-badge-pill" style="display: none;">0</span>
+          </button>
+          <button class="topbar-btn profile-trigger-btn">
+            <span>👤</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- NOTIFICATIONS DROPDOWN -->
+      <div class="notif-dropdown" id="notifDropdown">
+        <div class="notif-header">
+          <h4 style="margin: 0; font-size: 0.95rem; color: #fff;">CampusSync Notifications</h4>
+          <button class="btn btn-outline btn-sm" id="clearNotifsBtn" style="padding: 0.2rem 0.5rem; font-size: 0.72rem;">Clear</button>
+        </div>
+        <div class="notif-list" id="notifList"></div>
+      </div>
+
+      <!-- MAIN CONTENT -->
+      <main class="page-content-wrapper">
+
+        <div style="margin-bottom: 2rem;">
+          <span class="badge badge-primary" style="margin-bottom: 0.4rem;">Feature 3 • Events Discovery</span>
+          <h1 style="color: #fff; font-size: 2rem; font-weight: 800; margin-bottom: 0.35rem;">Campus Events</h1>
+          <p style="color: var(--text-muted); font-size: 0.95rem;">See what's happening around campus.</p>
+        </div>
+
+        <!-- ========================================================
+             🔴 HAPPENING NOW SECTION (PROMINENT LIVE BANNER)
+             ======================================================== -->
+        <section class="events-section-block" id="happeningNowSection">
+          <div class="events-section-header">
+            <span class="badge badge-live">🔴 LIVE NOW</span>
+            <h2 class="events-section-title">Happening Right Now</h2>
+          </div>
+
+          <!-- Dynamic Live Banner Container -->
+          <div id="liveEventsContainer">
+            <!-- Rendered by js/events.js -->
+          </div>
+        </section>
+
+        <!-- SEARCH & FILTER TOOLBAR -->
+        <div class="filter-toolbar-card">
+          <div class="filter-search-row">
+            <div class="filter-search-box">
+              <span style="position: absolute; left: 0.85rem; color: var(--text-dim);">🔍</span>
+              <input
+                type="text"
+                id="eventSearchInput"
+                placeholder="Search events by title, organizer club, or venue..."
+                autocomplete="off"
+              >
+            </div>
+          </div>
+
+          <div class="filter-pills-row">
+            <!-- Timing segmented filter -->
+            <div class="filter-type-segmented" id="eventTimingFilters">
+              <button class="filter-segment-btn active" data-time="all">All</button>
+              <button class="filter-segment-btn" data-time="live">🔴 Happening Now</button>
+              <button class="filter-segment-btn" data-time="upcoming">Upcoming</button>
+              <button class="filter-segment-btn" data-time="thisWeek">This Week</button>
+              <button class="filter-segment-btn" data-time="completed">Completed</button>
+            </div>
+
+            <!-- Category filter dropdown -->
+            <div class="select-filters-group">
+              <select id="eventCategorySelect" class="select-filter-input">
+                <option value="all">All Categories</option>
+                <option value="Technology">Technology</option>
+                <option value="Workshops">Workshops</option>
+                <option value="Cultural">Cultural</option>
+                <option value="Sports">Sports</option>
+                <option value="Entertainment">Entertainment</option>
+                <option value="Academic">Academic</option>
+                <option value="Clubs">Clubs</option>
+              </select>
+
+              <button id="eventResetFiltersBtn" class="btn btn-outline btn-sm">Reset</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================================
+             UPCOMING EVENTS SECTION
+             ======================================================== -->
+        <section class="events-section-block">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <div style="display: flex; align-items: center; gap: 0.6rem;">
+              <span style="font-size: 1.3rem;">📅</span>
+              <h2 class="events-section-title" id="eventsSectionHeading">Upcoming Campus Activities (<span id="upcomingCount">0</span>)</h2>
+            </div>
+            <span style="font-size: 0.85rem; color: var(--text-muted);" id="eventsFilterMeta">Showing all upcoming</span>
+          </div>
+
+          <div class="events-grid" id="upcomingEventsGrid">
+            <!-- Rendered by js/events.js -->
+          </div>
+
+          <!-- Empty state -->
+          <div id="eventsEmptyState" style="display: none; text-align: center; padding: 4rem 1rem; background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--card-radius);">
+            <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">📅</div>
+            <h3 style="color: #fff; font-size: 1.2rem; margin-bottom: 0.5rem;">No events match your criteria</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.25rem;">Try clearing your search query or selecting another category.</p>
+            <button class="btn btn-secondary" onclick="document.getElementById('eventResetFiltersBtn').click()">Reset Filters</button>
+          </div>
+        </section>
+
+        <!-- ========================================================
+             COMPLETED EVENTS ARCHIVE
+             ======================================================== -->
+        <section class="events-section-block" id="completedEventsSection" style="margin-top: 4rem;">
+          <div class="events-section-header">
+            <span class="badge badge-purple">Archive</span>
+            <h2 class="events-section-title">Past / Completed Events</h2>
+          </div>
+
+          <div class="events-grid" id="completedEventsGrid">
+            <!-- Rendered by js/events.js -->
+          </div>
+        </section>
+
+      </main>
+
+      <!-- MOBILE BOTTOM NAVIGATION -->
+      <nav class="mobile-bottom-nav">
+        <a href="index.html" class="bottom-nav-item">
+          <span class="bottom-nav-icon">🏠</span>
+          <span>Home</span>
+        </a>
+        <a href="navigation.html" class="bottom-nav-item">
+          <span class="bottom-nav-icon">📍</span>
+          <span>Navigate</span>
+        </a>
+        <a href="lost-found.html" class="bottom-nav-item">
+          <span class="bottom-nav-icon">🔎</span>
+          <span>Lost/Found</span>
+        </a>
+        <a href="spaces.html" class="bottom-nav-item">
+          <span class="bottom-nav-icon">🏫</span>
+          <span>Spaces</span>
+        </a>
+        <a href="events.html" class="bottom-nav-item active">
+          <span class="bottom-nav-icon">📅</span>
+          <span>Events</span>
+        </a>
+      </nav>
+
+    </div>
+  </div>
+
+  <!-- ========================================================
+       EVENT DETAILS MODAL
+       ======================================================== -->
+  <div class="custom-modal" id="eventDetailsModal" role="dialog" aria-label="Event details">
+    <div class="modal-dialog" style="max-width: 700px;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 0.6rem;">
+          <span id="modalEventBadge" class="badge badge-purple">Technology</span>
+          <span id="modalEventLiveTag" class="badge badge-live" style="display: none;">🔴 Happening Now</span>
+        </div>
+        <button class="modal-close" id="closeEventModalBtn">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div style="width: 100%; height: 260px; border-radius: var(--radius-md); overflow: hidden; background: #070c18;">
+          <img id="modalEventBanner" src="" alt="Banner" style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+
+        <div>
+          <h2 id="modalEventTitle" style="color: #fff; font-size: 1.5rem; font-weight: 800; margin-bottom: 0.5rem;">Event Title</h2>
+          <div style="font-size: 0.88rem; color: var(--accent-primary); font-weight: 600;" id="modalEventOrganizer">
+            Organized by: GDSC
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1rem;">
+          <div>
+            <div style="font-size: 0.78rem; color: var(--text-dim);">DATE &amp; TIME</div>
+            <div id="modalEventDateTime" style="font-size: 0.92rem; font-weight: 700; color: #fff; margin-top: 0.2rem;">Oct 24, 5:00 PM</div>
+          </div>
+          <div>
+            <div style="font-size: 0.78rem; color: var(--text-dim);">CAMPUS VENUE</div>
+            <div id="modalEventVenue" style="font-size: 0.92rem; font-weight: 700; color: #fff; margin-top: 0.2rem;">Main Auditorium</div>
+          </div>
+        </div>
+
+        <div>
+          <h4 style="color: #fff; font-size: 0.95rem; margin-bottom: 0.4rem;">About This Event</h4>
+          <p id="modalEventDesc" style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6;">
+            Event description goes here.
+          </p>
+        </div>
+
+        <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: var(--radius-md); padding: 0.85rem 1.25rem;">
+          <div>
+            <span style="font-size: 0.78rem; color: var(--text-dim); text-transform: uppercase;">Confirmed RSVPs</span>
+            <div id="modalEventRsvpCount" style="font-size: 1.2rem; font-weight: 800; color: #fff;">142 Attending</div>
+          </div>
+          <!-- Deep link to Feature 1 Navigation! -->
+          <button id="modalNavigateVenueBtn" class="btn btn-nav-action btn-sm">
+            <span>📍</span> Navigate to Venue &rarr;
+          </button>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="modalBookmarkBtn">🔖 Bookmark</button>
+        <button class="btn btn-primary" id="modalRsvpBtn">RSVP Now</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="data/demo-data.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/events.js"></script>
+</body>
+</html>

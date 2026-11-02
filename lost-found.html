@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Lost &amp; Found — CampusSync</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon/favicon.svg">
+  <link rel="stylesheet" href="css/style.css">
+  <!-- Authentication & Access Gate -->
+  <script src="js/auth.js"></script>
+  <script>CampusAuth.requireAuth();</script>
+</head>
+<body>
+
+  <div class="app-layout">
+
+    <!-- DESKTOP SIDEBAR -->
+    <aside class="app-sidebar">
+      <div class="sidebar-header">
+        <a href="index.html" class="sidebar-logo">
+          <div class="sidebar-logo-icon">⚡</div>
+          <span class="sidebar-logo-text">Campus<strong>Sync</strong></span>
+        </a>
+        <button id="sidebarCloseBtn" class="topbar-btn" style="display: none;" aria-label="Close sidebar">&times;</button>
+      </div>
+
+      <div class="sidebar-nav-container">
+        <span class="sidebar-section-title">Navigation</span>
+        <ul class="sidebar-menu">
+          <li>
+            <a href="index.html" class="sidebar-link">
+              <span class="sidebar-link-icon">🏠</span>
+              <span>Home</span>
+            </a>
+          </li>
+          <li>
+            <a href="navigation.html" class="sidebar-link">
+              <span class="sidebar-link-icon">📍</span>
+              <span>Where is your Block?</span>
+              <span class="sidebar-badge badge-live">LIVE</span>
+            </a>
+          </li>
+          <li>
+            <a href="lost-found.html" class="sidebar-link active">
+              <span class="sidebar-link-icon">🔎</span>
+              <span>Lost &amp; Found</span>
+              <span class="sidebar-badge badge-count" id="sidebarLfCount">10</span>
+            </a>
+          </li>
+          <li>
+            <a href="spaces.html" class="sidebar-link">
+              <span class="sidebar-link-icon">🏫</span>
+              <span>Spaces</span>
+            </a>
+          </li>
+          <li>
+            <a href="events.html" class="sidebar-link">
+              <span class="sidebar-link-icon">📅</span>
+              <span>Events</span>
+              <span class="sidebar-badge badge-live">1 LIVE</span>
+            </a>
+          </li>
+          <li>
+            <a href="navigation.html" class="sidebar-link">
+              <span class="sidebar-link-icon">🗺️</span>
+              <span>Campus Map</span>
+            </a>
+          </li>
+        </ul>
+
+        <span class="sidebar-section-title">AI Matching Radar</span>
+        <div class="sidebar-pulse-card">
+          <div class="pulse-header">
+            <span class="pulse-dot"></span>
+            <span>Smart Match Active</span>
+          </div>
+          <p class="pulse-info">
+            • 4-Attribute Rule Engine<br>
+            • Category (+3), Colour (+2)<br>
+            • Location (+2), Keywords (+1)
+          </p>
+        </div>
+      </div>
+
+      <div class="sidebar-footer">
+        <a href="#" class="sidebar-user profile-trigger-btn" title="View Student Profile">
+          <div class="user-avatar user-initials">--</div>
+          <div class="user-info">
+            <div class="user-name">Student</div>
+            <div class="user-dept user-reg-no">--</div>
+          </div>
+        </a>
+        <div class="sidebar-footer-actions">
+          <button type="button" class="logout-btn" title="Sign out / Logout" onclick="if(typeof CampusAuth!=='undefined'){CampusAuth.logout();}else{try{localStorage.removeItem('campussync_current_session');localStorage.removeItem('campussync_user_profile');}catch(e){}window.location.href='login.html';}">🚪</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN WRAPPER -->
+    <div class="app-main">
+
+      <!-- MOBILE TOP HEADER BAR -->
+      <header class="mobile-header-bar">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <button id="mobileMenuBtn" class="topbar-btn" aria-label="Toggle menu">
+            <span>☰</span>
+          </button>
+          <a href="index.html" class="sidebar-logo">
+            <span class="sidebar-logo-text">Campus<strong>Sync</strong></span>
+          </a>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <button class="topbar-btn notif-toggle-btn" aria-label="Notifications">
+            <span>🔔</span>
+            <span class="notif-badge-pill" style="display: none;">0</span>
+          </button>
+          <button class="topbar-btn profile-trigger-btn" aria-label="Profile">
+            <span>👤</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- NOTIFICATIONS DROPDOWN -->
+      <div class="notif-dropdown" id="notifDropdown">
+        <div class="notif-header">
+          <h4 style="margin: 0; font-size: 0.95rem; color: #fff;">CampusSync Notifications</h4>
+          <button class="btn btn-outline btn-sm" id="clearNotifsBtn" style="padding: 0.2rem 0.5rem; font-size: 0.72rem;">Clear</button>
+        </div>
+        <div class="notif-list" id="notifList"></div>
+      </div>
+
+      <!-- MAIN CONTENT -->
+      <main class="page-content-wrapper">
+
+        <!-- HEADER ROW WITH TITLE & ACTION BUTTONS -->
+        <div class="lf-header-row">
+          <div class="lf-title-group">
+            <span class="badge badge-primary" style="margin-bottom: 0.4rem;">Feature 2 • Smart Matching</span>
+            <h1>Lost &amp; Found</h1>
+            <p>Help campus belongings find their way home.</p>
+          </div>
+          <div class="lf-actions-group">
+            <button id="openReportLostBtn" class="btn btn-lost">+ Report Lost Item</button>
+            <button id="openReportFoundBtn" class="btn btn-found">+ Report Found Item</button>
+          </div>
+        </div>
+
+        <!-- SEARCH & MULTI-FILTER TOOLBAR -->
+        <div class="filter-toolbar-card">
+          <div class="filter-search-row">
+            <div class="filter-search-box">
+              <span style="position: absolute; left: 0.85rem; color: var(--text-dim);">🔍</span>
+              <input
+                type="text"
+                id="lfSearchInput"
+                placeholder="Search items by name, category, colour, location..."
+                autocomplete="off"
+              >
+            </div>
+          </div>
+
+          <div class="filter-pills-row">
+            <!-- Type segmented filter -->
+            <div class="filter-type-segmented" id="lfTypeFilters">
+              <button class="filter-segment-btn active" data-type="all">All</button>
+              <button class="filter-segment-btn" data-type="lost">Lost</button>
+              <button class="filter-segment-btn" data-type="found">Found</button>
+            </div>
+
+            <!-- Dropdown filters -->
+            <div class="select-filters-group">
+              <select id="lfCategorySelect" class="select-filter-input">
+                <option value="all">All Categories</option>
+                <option value="Electronics">Electronics</option>
+                <option value="Bags">Bags</option>
+                <option value="Cards/IDs">ID Cards</option>
+                <option value="Personal">Wallets &amp; Personal</option>
+                <option value="Books/Notes">Books &amp; Notes</option>
+                <option value="Keys">Keys</option>
+                <option value="Clothing">Clothing</option>
+                <option value="Other">Other</option>
+              </select>
+
+              <select id="lfLocationSelect" class="select-filter-input">
+                <option value="all">All Locations</option>
+                <option value="Library">Central Library</option>
+                <option value="Block S">Block S</option>
+                <option value="Block 32">Block 32</option>
+                <option value="Cafeteria">Cafeteria</option>
+                <option value="Sports">Sports Complex</option>
+                <option value="Hostel">Hostels</option>
+              </select>
+
+              <button id="lfResetFiltersBtn" class="btn btn-outline btn-sm">Reset</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- SMART MATCH RADAR SECTION -->
+        <section class="match-radar-card" id="matchRadarSection">
+          <div class="radar-header-row">
+            <div class="radar-title-group">
+              <span class="pulse-dot" style="background: var(--accent-amber); box-shadow: 0 0 10px var(--accent-amber);"></span>
+              <h3 style="color: #fff; font-size: 1.2rem; font-weight: 700; margin: 0;">Smart Match Radar</h3>
+              <span class="badge badge-amber" id="matchRadarCountBadge">2 Possible Matches</span>
+            </div>
+            <span style="font-size: 0.8rem; color: var(--text-muted);">Multi-Criteria Rule Engine</span>
+          </div>
+          <p style="font-size: 0.86rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
+            Automatically evaluates reported Lost items against candidate Found items based on <strong>Category (+3)</strong>, <strong>Colour (+2)</strong>, <strong>Location (+2)</strong>, and <strong>Keywords (+1)</strong>.
+          </p>
+
+          <!-- Radar matches list container -->
+          <div class="radar-matches-list" id="radarMatchesContainer"></div>
+        </section>
+
+        <!-- ALL CAMPUS REPORTS GRID -->
+        <section>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+            <h2 style="color: #fff; font-size: 1.4rem; font-weight: 700;">Campus Belongings (<span id="reportsCounter">0</span>)</h2>
+            <span style="font-size: 0.85rem; color: var(--text-muted);" id="filterResultsMeta">Showing all items</span>
+          </div>
+
+          <div class="lf-cards-grid" id="lfReportsGrid">
+            <!-- Rendered by js/lost-found.js -->
+          </div>
+
+          <!-- Empty State -->
+          <div id="lfEmptyState" style="display: none; text-align: center; padding: 4rem 1rem; background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--card-radius);">
+            <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">📭</div>
+            <h3 style="color: #fff; font-size: 1.2rem; margin-bottom: 0.5rem;">No campus items match your criteria</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.25rem;">Try adjusting search terms or clearing your filters.</p>
+            <button class="btn btn-secondary" onclick="document.getElementById('lfResetFiltersBtn').click()">Reset All Filters</button>
+          </div>
+        </section>
+
+      </main>
+
+      <!-- MOBILE BOTTOM NAVIGATION -->
+      <nav class="mobile-bottom-nav">
+        <a href="index.html" class="bottom-nav-item">
+          <span class="bottom-nav-icon">🏠</span>
+          <span>Home</span>
+        </a>
+        <a href="navigation.html" class="bottom-nav-item">
+          <span class="bottom-nav-icon">📍</span>
+          <span>Navigate</span>
+        </a>
+        <a href="lost-found.html" class="bottom-nav-item active">
+          <span class="bottom-nav-icon">🔎</span>
+          <span>Lost/Found</span>
+        </a>
+        <a href="spaces.html" class="bottom-nav-item">
+          <span class="bottom-nav-icon">🏫</span>
+          <span>Spaces</span>
+        </a>
+        <a href="events.html" class="bottom-nav-item">
+          <span class="bottom-nav-icon">📅</span>
+          <span>Events</span>
+        </a>
+      </nav>
+
+    </div>
+  </div>
+
+  <!-- ========================================================
+       MODAL 1: ITEM DETAILS MODAL
+       ======================================================== -->
+  <div class="custom-modal" id="itemDetailsModal" role="dialog" aria-label="Item details">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 0.6rem;">
+          <span id="detailStatusBadge" class="badge badge-lost">LOST ITEM</span>
+          <span id="detailCategoryBadge" class="badge badge-primary">Electronics</span>
+        </div>
+        <button class="modal-close" id="closeDetailModalBtn">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div style="width: 100%; height: 240px; border-radius: var(--radius-md); overflow: hidden; background: #070c18;">
+          <img id="detailItemImg" src="" alt="Item" style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+
+        <div>
+          <h3 id="detailItemTitle" style="color: #fff; font-size: 1.4rem; font-weight: 700; margin-bottom: 0.4rem;">AirPods Pro Case</h3>
+          <div style="display: flex; flex-wrap: wrap; gap: 1rem; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+            <span>📍 <strong id="detailLocation" style="color: #fff;">Central Library</strong></span>
+            <span>📅 <strong id="detailDate" style="color: #fff;">Today</strong></span>
+            <span>🎨 Colour: <strong id="detailColour" style="color: #fff;">White</strong></span>
+          </div>
+        </div>
+
+        <div>
+          <h4 style="color: #fff; font-size: 0.95rem; margin-bottom: 0.4rem;">Description &amp; Identifying Details</h4>
+          <p id="detailDescription" style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; background: rgba(255, 255, 255, 0.03); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border);">
+            Item description here.
+          </p>
+        </div>
+
+        <!-- Possible Match info section if paired -->
+        <div id="detailMatchBox" style="display: none; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.35); padding: 1rem; border-radius: var(--radius-sm);">
+          <div style="font-size: 0.85rem; font-weight: 700; color: #fcd34d; margin-bottom: 0.3rem;">⚡ Possible Match Detected</div>
+          <p id="detailMatchText" style="font-size: 0.82rem; color: #cbd5e1; margin: 0;"></p>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="detailCloseBtn">Close</button>
+        <button class="btn btn-primary" id="claimItemBtn">
+          <span>🔒</span> Contact / Claim Item
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       MODAL 2: REPORT ITEM MODAL (REPORT LOST & REPORT FOUND)
+       ======================================================== -->
+  <div class="custom-modal" id="reportItemModal" role="dialog" aria-label="Report item">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title" id="reportModalTitle">Report an Item</h3>
+        <button class="modal-close" id="closeReportModalBtn">&times;</button>
+      </div>
+
+      <form id="modalReportForm">
+        <div class="modal-body">
+
+          <!-- Type Selector Tabs -->
+          <div class="filter-type-segmented" style="width: 100%; display: grid; grid-template-columns: 1fr 1fr; margin-bottom: 0.5rem;">
+            <button type="button" class="filter-segment-btn active" id="tabReportLost" data-type="lost">I Lost an Item</button>
+            <button type="button" class="filter-segment-btn" id="tabReportFound" data-type="found">I Found an Item</button>
+          </div>
+          <input type="hidden" id="reportTypeInput" value="lost">
+
+          <!-- Image Upload with FileReader preview -->
+          <div class="form-group">
+            <label class="form-label">Upload Image (Optional)</label>
+            <div class="file-upload-zone" id="fileUploadDropzone">
+              <input type="file" id="reportImageInput" accept="image/*" style="display: none;">
+              <div id="fileUploadPrompt">
+                <span style="font-size: 1.8rem; display: block; margin-bottom: 0.25rem;">📷</span>
+                <span style="font-size: 0.88rem; color: var(--accent-primary); font-weight: 600;">Click to upload photo</span>
+                <span style="font-size: 0.75rem; color: var(--text-dim); display: block; margin-top: 0.2rem;">PNG, JPG, WebP up to 5MB</span>
+              </div>
+              <img id="fileUploadPreview" class="file-preview-img" style="display: none;" alt="Preview">
+            </div>
+          </div>
+
+          <!-- Item Name -->
+          <div class="form-group">
+            <label class="form-label" for="reportItemName">Item Name <span style="color: var(--accent-rose);">*</span></label>
+            <input type="text" id="reportItemName" class="form-input" placeholder="e.g. AirPods Case, Black Wildcraft Backpack" required>
+          </div>
+
+          <!-- Category & Colour -->
+          <div class="form-row-2col">
+            <div class="form-group">
+              <label class="form-label" for="reportCategory">Category <span style="color: var(--accent-rose);">*</span></label>
+              <select id="reportCategory" class="form-select" required>
+                <option value="" disabled selected>Select category</option>
+                <option value="Electronics">Electronics</option>
+                <option value="Bags">Bags</option>
+                <option value="Cards/IDs">ID Cards</option>
+                <option value="Personal">Wallets &amp; Personal</option>
+                <option value="Books/Notes">Books &amp; Notes</option>
+                <option value="Keys">Keys</option>
+                <option value="Clothing">Clothing</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="reportColour">Colour <span style="color: var(--accent-rose);">*</span></label>
+              <input type="text" id="reportColour" class="form-input" placeholder="e.g. Black, Navy Blue, Silver" required>
+            </div>
+          </div>
+
+          <!-- Location & Date -->
+          <div class="form-row-2col">
+            <div class="form-group">
+              <label class="form-label" for="reportLocation">Campus Location <span style="color: var(--accent-rose);">*</span></label>
+              <input type="text" id="reportLocation" class="form-input" placeholder="e.g. Central Library 2nd Floor, Block 32" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="reportDate">Date <span style="color: var(--accent-rose);">*</span></label>
+              <input type="date" id="reportDate" class="form-input" required>
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="form-group">
+            <label class="form-label" for="reportDesc">Description &amp; Identifying Marks <span style="color: var(--accent-rose);">*</span></label>
+            <textarea id="reportDesc" class="form-textarea" rows="3" placeholder="Include unique markings, scratches, stickers, brand names or serial numbers..." required></textarea>
+          </div>
+
+          <!-- Contact Email (Kept private) -->
+          <div class="form-group">
+            <label class="form-label" for="reportContactEmail">
+              Contact Email <span style="color: var(--accent-rose);">*</span>
+              <span style="color: var(--accent-primary); font-size: 0.75rem; font-weight: normal;">(Private • Never displayed publicly)</span>
+            </label>
+            <input type="email" id="reportContactEmail" class="form-input" placeholder="yourname@campus.edu" required>
+          </div>
+
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="cancelReportBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="submitReportModalBtn">
+            Submit Report
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="data/demo-data.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/lost-found.js"></script>
+</body>
+</html>
